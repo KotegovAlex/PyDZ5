@@ -9,8 +9,9 @@
         # a) Добавьте игру против бота
         # b) Подумайте как наделить бота ""интеллектом""
 import random as r
+from types import NoneType
 
-candy_number = 221
+candy_number = 2021
 
 def game_2021_candy_pvp(candys: int):
     print('''
@@ -18,19 +19,17 @@ def game_2021_candy_pvp(candys: int):
             За один ход можно забрать не более чем 28 конфет.
             Все конфеты оппонента достаются сделавшему последний ход.
             ''') 
-    print('Чтобы определить, кто ходит первым, необходимо угадать число от 1 до 5')
-    number = r.randint(1, 5)
-    
-    turn = 1
-    while number != int(input('Введите число от 1 до 5 => ')):
-        print('Не угадал - смена игрока')
-        turn += 1
-    else:
-        print('Число угадано!')
-    if turn % 2 != 0:
-        print('Первым ходит Игрок 1')
-    else:
-        print('Первым ходит Игрок 2')
+    print('Рандом решит, кто будет ходить первым!!!')
+    print()
+    turn = r.choice([1, 2])
+
+    # Жеребьевка
+    print('Бог рандома решил, что первым будет ходить: ')
+    match turn:
+        case 1: 
+            print('Игрок 1')
+        case 2: 
+            print('Игрок 2')
     
     while candys != 0:
         print()
@@ -52,7 +51,8 @@ def game_2021_candy_pvp(candys: int):
             print('Игра окончена. Все конфеты получает Игрок 1')
         else:
             print('Игра окончена. Все конфеты получает Игрок 2')
-        
+
+
 def game_2021_candy_pve(candys: int):
     print('''
             Игра против бота началась! Первый ход определяется жеребьёвкой.
@@ -61,35 +61,26 @@ def game_2021_candy_pve(candys: int):
             ''') 
     print('Чтобы определить, кто ходит первым, необходимо угадать число от 1 до 5')
     number = r.randint(1, 5)
-    # print(number)
-    turn = 1
-    x = 0
-    while number != x:
-        if turn % 2 != 0:
-            x = int(input('Введите число от 1 до 5 => '))
-        else:
-            x = r.randint(1, 5)
-            print(f'Бот выбрал число => {x}')
-        print('Не угадал - смена игрока')
-        print()
-        turn += 1
-    else:
-        print('Число угадано!')
-    if turn % 2 != 0:
-        print('Первым ходит Игрок')
-    else:
-        print('Первым ходит Бот')
-    
+
+    print('Рандом решит, кто будет ходить первым!!!')
+    print()
+    turn = r.choice([1, 2])
+
+    # Жеребьевка
+    print('Бог рандома решил, что первым будет ходить: ')
+    match turn:
+        case 1: 
+            print('Игрок')
+        case 2: 
+            print('Бот')
+
     while candys != 0:
         print()
         print(f'Количество конфет на столе: {candys}')
-        if turn % 2 != 0:
-            drag = int(input('Ход Игрока, берите конфеты => '))
+        if turn % 2 != 0: drag = int(input('Ход Игрока, берите конфеты => '))
         else:
-            if candys >= 28:
-                drag = r.randint(1, 28)
-            else:
-                drag = r.randint(1, candys)
+            if candys >= 28: drag = r.randint(1, 28)
+            else: drag = r.randint(1, candys)
             print(f'Ход Бота, конфет взято => {drag}')
         if drag > 28: 
             print('Нельзя брать больше 28 конфет за раз!!!')
@@ -103,9 +94,89 @@ def game_2021_candy_pve(candys: int):
         candys -= drag
         turn += 1
     else:
-        if turn % 2 == 0:
-            print('Игра окончена. Все конфеты получает Игрок')
-        else:
-            print('Игра окончена. Все конфеты получает Бот')
+        if turn % 2 == 0: print('Игра окончена. Все конфеты получает Игрок')
+        else: print('Игра окончена. Все конфеты получает Бот')
 
-game_2021_candy_pve(candy_number)
+
+def game_2021_candy_pve_smart(candys: int):
+    print('''
+            Игра против "умного" бота началась! Первый ход определяется жеребьёвкой.
+            За один ход можно забрать не более чем 28 конфет.
+            Все конфеты оппонента достаются сделавшему последний ход.
+            ''') 
+    print('Рандом решит, кто будет ходить первым!!!')
+    print()
+    turn = r.choice([1, 2])
+    status = NoneType
+
+    # Жеребьевка
+    print('Бог рандома решил, что первым будет ходить: ')
+    match turn:
+        case 1: 
+            print('Игрок')
+        case 2: 
+            print('Бот')
+            status = 1
+    print()
+    
+    # Определение действий для "умного" бота
+    print(f'Количество конфет на столе: {candys}')
+    match status:
+        case 1: 
+            drag = 20
+            print(f'Ход Бота, конфет взято => {drag}')
+            status = 5
+        case _: 
+            drag = int(input('Ход Игрока, берите конфеты => '))
+            if drag < 20: status = 2
+            elif drag == 20: status = 3
+            else: status = 4
+    candys -= drag
+    turn += 1
+
+    while candys != 0:
+        print()
+        print(f'Количество конфет на столе: {candys}')
+
+        if turn % 2 != 0: 
+            drag = int(input('Ход Игрока, берите конфеты => '))
+        else:
+            match status:
+                case 2:
+                    drag = 20 - drag
+                    status = 5
+                case 3:
+                    if drag == 20:
+                        drag = 29 - drag
+                    elif drag < 20:
+                        status = 2
+                        continue
+                    else: 
+                        status = 4
+                        continue
+                case 4:
+                    drag = 49 - drag
+                    status = 5
+                case 5:
+                    drag = 29 - drag
+            print(f'Ход Бота, конфет взято => {drag}')
+        if (drag > 28) or (drag < 1): 
+            print('За раз можно взять от 1 до 28 конфет!!!')
+            continue
+        if (drag > candys) and (candys < 28):
+            print('На столе нет столько конфет!!!')
+            continue
+        candys -= drag
+        turn += 1
+    else:
+        if turn % 2 == 0: print('Игра окончена. Все конфеты получает Игрок')
+        else: print('Игра окончена. Все конфеты получает Бот')
+
+    # 1. Игрок против Игрока
+# game_2021_candy_pvp(candy_number)
+
+    # a) Игрок против Бота
+# game_2021_candy_pve(candy_number)
+
+    # b) Игрок против "умного" Бота
+game_2021_candy_pve_smart(candy_number) 
